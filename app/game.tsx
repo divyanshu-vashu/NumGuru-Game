@@ -15,8 +15,11 @@ export default function GameScreen() {
   const [grid, setGrid] = useState<number[][]>([]);
   const [score, setScore] = useState<number>(0);
   const [level, setLevel] = useState<number>(1);
-  const [highScore, setHighScore] = useState<number>(0); // State for high score
+  const [highScore, setHighScore] = useState<number>(0);
   const [selectedCell, setSelectedCell] = useState<Position | null>(null);
+  
+  // New state for invalid match feedback
+  const [invalidPair, setInvalidPair] = useState<Position[] | null>(null);
 
   const isGameWon = useRef(false);
 
@@ -25,7 +28,6 @@ export default function GameScreen() {
       const savedProgress = await loadGameState();
       const savedHighScore = await loadHighScore();
       setHighScore(savedHighScore);
-
       if (savedProgress) {
         game.grid = savedProgress.grid;
         game.score = savedProgress.score;
@@ -36,15 +38,12 @@ export default function GameScreen() {
       updateGameState();
       setIsLoading(false);
     };
-
     initializeGame();
   }, [game]);
 
   useEffect(() => {
     return () => {
-      if (!isGameWon.current) {
-        saveGameState(game);
-      }
+      if (!isGameWon.current) saveGameState(game);
     };
   }, [game]);
 
@@ -53,21 +52,19 @@ export default function GameScreen() {
     setGrid(newGrid);
     setScore(game.score);
     setLevel(game.level);
-
-    // Check if the current score is a new high score
     if (game.score > highScore) {
-      setHighScore(game.score); // Update the UI
-      saveHighScore(game.score); // Persist the new high score
+      setHighScore(game.score);
+      saveHighScore(game.score);
     }
-
-    if (newGrid.length === 0 || newGrid.flat().every(cell => cell === 0)) {
+    if (newGrid.length === 0 || newGrid.flat().every(cell => cell <= 0)) {
         isGameWon.current = true;
         clearGameState();
     }
-  }, [game, highScore]); // Add highScore as a dependency
+  }, [game, highScore]);
 
   const handleCellPress = (row: number, col: number) => {
-    if (grid[row][col] === 0 || isLoading) return;
+    // Prevent clicking on empty or already matched cells
+    if (grid[row][col] <= 0 || isLoading) return;
     
     if (!selectedCell) {
       setSelectedCell({ row, col });
@@ -81,6 +78,14 @@ export default function GameScreen() {
 
     if (game.attemptToMatch(selectedCell, { row, col })) {
       updateGameState();
+    } else {
+      // --- FEEDBACK LOGIC ---
+      // On invalid match, set the pair for feedback
+      setInvalidPair([selectedCell, { row, col }]);
+      // Clear the feedback after a short delay
+      setTimeout(() => {
+        setInvalidPair(null);
+      }, 300);
     }
     
     setSelectedCell(null);
@@ -95,7 +100,6 @@ export default function GameScreen() {
     return (
       <SafeAreaView style={[styles.container, { justifyContent: 'center' }]}>
         <ActivityIndicator size="large" color="#f0c419" />
-        <Text style={{ color: 'white', marginTop: 10 }}>Loading...</Text>
       </SafeAreaView>
     );
   }
@@ -114,7 +118,6 @@ export default function GameScreen() {
       
       <View style={styles.subHeader}>
             <Text style={styles.levelText}>Stage {level}</Text>
-            {/* Display the dynamic high score */}
             <Text style={styles.allTimeText}>All-Time {highScore}</Text>
         </View>
 
@@ -127,6 +130,8 @@ export default function GameScreen() {
                     number={number}
                     onPress={() => handleCellPress(rowIndex, colIndex)}
                     isSelected={selectedCell?.row === rowIndex && selectedCell?.col === colIndex}
+                    // Pass the invalid state to the cell
+                    isInvalid={invalidPair?.some(p => p.row === rowIndex && p.col === colIndex) ?? false}
                     />
                 ))}
                 </View>

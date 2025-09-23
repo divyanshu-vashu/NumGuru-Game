@@ -13,17 +13,34 @@ type GridCellProps = {
   number: number;
   onPress: () => void;
   isSelected: boolean;
+  isInvalid: boolean; // New prop for feedback
 };
 
-export const GridCell: React.FC<GridCellProps> = ({ number, onPress, isSelected }) => {
+export const GridCell: React.FC<GridCellProps> = ({ number, onPress, isSelected, isInvalid }) => {
+  // A number is "matched" if it's negative.
+  const isMatched = number < 0;
+  // The number to display is always the absolute value.
+  const displayNumber = Math.abs(number);
+
+  // Don't render anything for empty cells (number 0)
   if (number === 0) {
     return <TouchableOpacity style={styles.cellEmpty} disabled />;
   }
 
   return (
-    <TouchableOpacity style={[styles.cell, isSelected && styles.selectedCell]} onPress={onPress}>
-      <Text style={[styles.numberText, { color: numberColors[number] || '#fff' }]}>
-        {number}
+    <TouchableOpacity
+      style={[
+        styles.cell,
+        isMatched && styles.matchedCell, // Style for matched (dull) cells
+        isSelected && styles.selectedCell,
+        isInvalid && styles.invalidCell, // Style for invalid feedback
+      ]}
+      onPress={onPress}
+      // Disable presses on already matched cells
+      disabled={isMatched}
+    >
+      <Text style={[styles.numberText, { color: numberColors[displayNumber] || '#fff' }, isMatched && styles.matchedText]}>
+        {displayNumber}
       </Text>
     </TouchableOpacity>
   );
@@ -50,8 +67,18 @@ const styles = StyleSheet.create({
     borderWidth: 1.5,
     borderColor: '#fff',
   },
+  matchedCell: {
+    backgroundColor: 'transparent',
+  },
+  invalidCell: {
+    borderColor: '#ff4d4d',
+    borderWidth: 1.5,
+  },
   numberText: {
     fontSize: CELL_SIZE * 0.6,
     fontWeight: 'bold',
+  },
+  matchedText: {
+    opacity: 0.3, 
   },
 });
