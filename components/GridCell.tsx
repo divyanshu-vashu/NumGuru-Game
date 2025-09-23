@@ -13,16 +13,13 @@ type GridCellProps = {
   number: number;
   onPress: () => void;
   isSelected: boolean;
-  isInvalid: boolean; // New prop for feedback
+  isInvalid: boolean;
 };
 
 export const GridCell: React.FC<GridCellProps> = ({ number, onPress, isSelected, isInvalid }) => {
-  // A number is "matched" if it's negative.
   const isMatched = number < 0;
-  // The number to display is always the absolute value.
   const displayNumber = Math.abs(number);
 
-  // Don't render anything for empty cells (number 0)
   if (number === 0) {
     return <TouchableOpacity style={styles.cellEmpty} disabled />;
   }
@@ -31,12 +28,11 @@ export const GridCell: React.FC<GridCellProps> = ({ number, onPress, isSelected,
     <TouchableOpacity
       style={[
         styles.cell,
-        isMatched && styles.matchedCell, // Style for matched (dull) cells
+        isMatched && styles.matchedCell,
         isSelected && styles.selectedCell,
-        isInvalid && styles.invalidCell, // Style for invalid feedback
+        isInvalid && styles.invalidCell,
       ]}
       onPress={onPress}
-      // Disable presses on already matched cells
       disabled={isMatched}
     >
       <Text style={[styles.numberText, { color: numberColors[displayNumber] || '#fff' }, isMatched && styles.matchedText]}>

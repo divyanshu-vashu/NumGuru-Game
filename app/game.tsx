@@ -18,7 +18,6 @@ export default function GameScreen() {
   const [highScore, setHighScore] = useState<number>(0);
   const [selectedCell, setSelectedCell] = useState<Position | null>(null);
   
-  // New state for invalid match feedback
   const [invalidPair, setInvalidPair] = useState<Position[] | null>(null);
 
   const isGameWon = useRef(false);
@@ -63,7 +62,6 @@ export default function GameScreen() {
   }, [game, highScore]);
 
   const handleCellPress = (row: number, col: number) => {
-    // Prevent clicking on empty or already matched cells
     if (grid[row][col] <= 0 || isLoading) return;
     
     if (!selectedCell) {
@@ -79,10 +77,7 @@ export default function GameScreen() {
     if (game.attemptToMatch(selectedCell, { row, col })) {
       updateGameState();
     } else {
-      // --- FEEDBACK LOGIC ---
-      // On invalid match, set the pair for feedback
       setInvalidPair([selectedCell, { row, col }]);
-      // Clear the feedback after a short delay
       setTimeout(() => {
         setInvalidPair(null);
       }, 300);
@@ -150,7 +145,6 @@ export default function GameScreen() {
   );
 }
 
-// Styles remain the same
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#2c1d5c' },
   header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 20, paddingTop: 10 },

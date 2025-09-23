@@ -3,7 +3,6 @@ import { StyleSheet, Text, View, TouchableOpacity, SafeAreaView } from 'react-na
 import { Link, useRouter, useFocusEffect } from 'expo-router';
 import { loadGameState, clearGameState, loadHighScore } from '../logic/gameStateStorage';
 
-// This component remains the same, but we will use it differently for "New Game"
 const MenuButton = ({ title, onPress, style, textStyle }: { title: string, onPress: () => void, style?: object, textStyle?: object }) => (
     <TouchableOpacity style={[styles.button, style]} onPress={onPress}>
       <Text style={[styles.buttonText, textStyle]}>{title}</Text>
@@ -13,7 +12,7 @@ const MenuButton = ({ title, onPress, style, textStyle }: { title: string, onPre
 export default function HomeScreen() {
   const [hasSavedGame, setHasSavedGame] = useState(false);
   const [highScore, setHighScore] = useState(0);
-  const router = useRouter(); // Get the router instance
+  const router = useRouter();
 
   useFocusEffect(
     React.useCallback(() => {
@@ -27,20 +26,13 @@ export default function HomeScreen() {
     }, [])
   );
 
-  // --- THIS IS THE FIX ---
-  // We now have two distinct actions.
 
-  /**
-   * Clears any saved game progress and then navigates to the game screen.
-   */
   const handleNewGame = async () => {
     await clearGameState();
     router.push('/game');
   };
 
-  /**
-   * Navigates directly to the game screen to load the existing progress.
-   */
+
   const handleContinue = () => {
     router.push('/game');
   };
@@ -52,7 +44,6 @@ export default function HomeScreen() {
         <Text style={styles.score}>🏆 {highScore}</Text>
       </View>
       <View style={styles.buttonContainer}>
-        {/* The "Continue" button now uses programmatic navigation */}
         {hasSavedGame && (
           <MenuButton
             title="Continue"
@@ -60,7 +51,6 @@ export default function HomeScreen() {
             style={styles.continueButton}
           />
         )}
-        {/* The "New Game" button also uses programmatic navigation */}
         <MenuButton
           title="New Game"
           onPress={handleNewGame}
@@ -72,7 +62,6 @@ export default function HomeScreen() {
   );
 }
 
-// Styles remain the same
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#1a0d3b', justifyContent: 'center', alignItems: 'center' },
   header: { alignItems: 'center', marginBottom: 60 },
