@@ -4,6 +4,10 @@ This is an [Expo](https://expo.dev) project# Number Master - A Logic Puzzle Game
 
 ![Game Screenshot](./assets/images/icon.png)
 
+![Screenshot_20251004-202940_NumGuru.png](https://github.com/user-attachments/assets/646fa2a9-7f9c-4d3b-97cd-d711ef02a3b8)
+
+![Screenshot_20251004-202935_NumGuru.png](https://github.com/user-attachments/assets/4e4dfefb-d684-450a-998e-ff62bb757a6a)
+
 Number Master is an engaging puzzle game where players match number pairs to clear the grid. The game challenges your pattern recognition and strategic thinking as you progress through increasingly difficult levels.
 
 ## 🎮 Demo
